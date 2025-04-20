@@ -1,0 +1,122 @@
+---
+title: "Module_5Project_1"
+author: "Beija"
+date: "2025-04-19"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+Due to a shared understanding that salaries for data scientists vary significantly across the globe, as well as additional factors such as the Great Recession and market competitiveness, what is the salary range necessary to attract top talent for positions within the United States?
+
+What are the cost differences between domestic and offshore hires? 
+
+What salary should a growing company offer in order to attract top data scientist talent, whether based in the United States or offshore, within the context of today’s competitive market? 
+
+What is the competitive salary range for a full-time data scientist in the United States compared to other global regions?
+
+Additionally, it would be beneficial to specify the salary ranges for both entry-level and senior-level positions, as these distinctions significantly influence hiring decisions.
+
+```{r}
+library(readr)
+library(dplyr) 
+salary_data <- read_csv("r project data-1.csv")
+str(salary_data)
+```
+```{r}
+# Convert to factors
+salary_data$experience_level <- as.factor(salary_data$experience_level)
+salary_data$employment_type <- as.factor(salary_data$employment_type)
+salary_data$job_title <- as.factor(salary_data$job_title)
+salary_data$salary_currency <- as.factor(salary_data$salary_currency)
+salary_data$employee_residence <- as.factor(salary_data$employee_residence)
+salary_data$company_location <- as.factor(salary_data$company_location)
+salary_data$company_size <- as.factor(salary_data$company_size)
+
+```
+
+Data Analysis 
+
+```{r}
+
+library (ggplot2)
+summary(salary_data)
+```
+
+```{r}
+ggplot(salary_data, aes(x = salary_in_usd)) +
+  geom_histogram(binwidth = 10000, fill = "darkgreen", color = "white") +
+  labs(title = "Distribution of Data Science Salaries (USD)", x = "Salary (USD)", y = "Count") +
+  theme_minimal()
+
+```
+
+The graph illustrating the Distribution of Data Science Salaries (USD) indicates that the highest concentration of salaries is observed between $60,000 and $150,000 USD. The modal salary range appears to fall within $100,000 to $130,000, which is likely indicative of the typical salary for data scientists on a global scale. Furthermore, there exists a small subset of individuals who earn significantly high salaries, exceeding $300,000, resulting in a long tail on the right side of the distribution. In order to offer a competitive salary, it is advisable for the CEO to consider a starting range of approximately $100,000 to $150,000 USD, contingent upon the specific location and level of experience of the candidates.
+
+
+
+```{r}
+ggplot(salary_data, aes(x = experience_level, y = salary_in_usd, fill = experience_level)) +
+  geom_boxplot() +
+  labs(title = "Salary by Experience Level", x = "Experience Level", y = "Salary (USD)") +
+  theme_minimal()
+
+
+```
+The salary data classified by experience level indicates that Executives (EX) command the highest compensation, demonstrating a broad range of salaries, with several significant high outliers reaching as much as $600,000 to $800,000. Furthermore, there is a discernible salary progression associated with increasing levels of experience:
+
+- **Entry-Level (EN)**: The median salary is approximately $50,000 to $80,000.
+- **Mid-Level (MI)**: The median salary is around $100,000.
+- **Senior-Level (SE)**: The median salary is approximately $150,000.
+- **Executive (EX)**: The median salary typically ranges from $200,000 to $250,000.
+
+For candidates anticipated to lead a team or assume the position of head of data, it would be prudent to offer a compensation package in the range of $180,000 to $250,000 in order to remain competitive, particularly for positions based in the United States.
+
+```{r}
+
+# Top 10 employee residence locations by count
+top_countries <- salary_data %>%
+  count(employee_residence, sort = TRUE) %>%
+  top_n(10, n) %>%
+  pull(employee_residence)
+
+# Filtered dataset
+filtered_data <- salary_data %>% 
+  filter(employee_residence %in% top_countries)
+
+# Bar plot of average salary by country
+filtered_data %>%
+  group_by(employee_residence) %>%
+  summarise(avg_salary = mean(salary_in_usd)) %>%
+  ggplot(aes(x = reorder(employee_residence, avg_salary), y = avg_salary, fill = employee_residence)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(title = "Average Salary by Country (Top 10)", x = "Country", y = "Avg Salary (USD)") +
+  theme_minimal()
+
+
+
+
+```
+
+
+
+
+The average salary by county in the United States (U.S.) leads globally, with the highest averages exceeding $140,000 USD. This figure underscores the premium associated with U.S.-based talent. 
+
+Japan (JP) and Canada (CA) also demonstrate high average salaries, generally exceeding $100,000 USD. In comparison, Germany (DE), the United Kingdom (GB), France (FR), and Spain (ES) fall into a middle salary range. 
+
+Conversely, Brazil (BR), Portugal (PT), India (IN), and Pakistan (PK) exhibit considerably lower average salaries. These nations present compelling options for cost-effective offshore hiring; however, variations in experience levels and market maturity should be considered. 
+
+Engaging talent within the U.S. typically necessitates a premium investment, often starting at $140,000 USD for experienced professionals. To manage costs while preserving quality, organizations may wish to explore nearshore or offshore alternatives in Europe or Asia, where salaries generally range from $30,000 to $90,000 USD. 
+
+Establishing a hybrid team that combines U.S. leadership with offshore support can effectively achieve a balance between quality and cost efficiency.
+
+```{r}
+print(head(salary_data))
+```
+
+
+
+
